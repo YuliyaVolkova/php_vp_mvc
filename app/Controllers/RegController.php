@@ -2,20 +2,15 @@
 
 namespace App\Controllers;
 
-use Gump;
 use App\Models\User;
 use App\Models\File;
+use Gump;
 
 class RegController extends MainController
 {
     use ClearDataController, ImageClearController;
 
     protected $data;
-
-    public function index()
-    {
-        $this->view->render('reg', []);
-    }
 
     protected function validation()
     {
@@ -29,13 +24,18 @@ class RegController extends MainController
         ]);
     }
 
+    public function index()
+    {
+        $this->view->render('reg', []);
+    }
+
     public function registration()
     {
         $this->data = $this->clearAll();
 
         if ($this->validation() === true) {
             if ($this->data['password'] !== $this->data['password-again']) {
-                echo 'Правильно введите повторный пароль';
+                echo 'Правильно введите повторный пароль. ';
                 $_SESSION['authorized_id'] = 0;
                 return null;
             }
@@ -51,14 +51,14 @@ class RegController extends MainController
                     $this->uploadedImageHandler();
                     File::store($this->filePath, $user['id']);
                 }
-                echo 'Вы зарегистрированы, '  . $user['name'] . '.';
+                echo 'Вы зарегистрированы, '  . $user['name'] . '. ';
                 $_SESSION['authorized_id'] = $user['id'];
             } else {
-                echo 'Регистрация не удалась, повторите попытку позже';
+                echo 'Регистрация не удалась, повторите попытку позже. ';
                 $_SESSION['authorized_id'] = 0;
             }
         } else {
-            echo 'Ответ сервера: проверьте заполнение полей.';
+            echo 'Ответ сервера: проверьте заполнение полей. ';
             $_SESSION['authorized_id'] = 0;
             return null;
         }

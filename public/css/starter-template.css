@@ -14,6 +14,7 @@ body {
   justify-content: center;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 20px;
 }
 .form-horizontal {
   width: 45%;
@@ -33,4 +34,22 @@ body {
 }
 .table-bordered {
     margin: 20px 0;
+}
+.admin-title {
+    color: cornflowerblue;
+    font-size: 25px;
+    text-align: right;
+    padding-top: 7px;
+}
+
+.admin-create {
+    padding-top: 20px;
+}
+
+.admin-create a{
+    color: goldenrod;
+    font-size: 18px;
+}
+.container {
+    width: 90%;
 }

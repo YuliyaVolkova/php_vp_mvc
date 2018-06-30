@@ -43,11 +43,27 @@ class Router
                 $actionFromRq = 'delete';
             }
 
+            if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'store' && !empty($_POST)) {
+                $actionFromRq = 'store';
+            }
+
+            if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'edit') {
+                $actionFromRq = 'edit';
+            }
+
+            if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'update' && !empty($_POST)) {
+                $actionFromRq = 'update';
+            }
+
+            if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'delete') {
+                $actionFromRq = 'delete';
+            }
+
             if ($controllerFromRq === 'Reg' && empty($_POST)) {
                $_SESSION['authorized_id'] = 0;
             }
 
-            if ($controllerFromRq === 'User' && $actionFromRq === 'all' && (!$_SESSION['authorized_id'])) {
+            if ($controllerFromRq === 'User' && (!$_SESSION['authorized_id'])) {
                 throw new Exception('Доступ только для авторизованных пользователей');
             }
 

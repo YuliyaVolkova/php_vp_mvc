@@ -34,12 +34,12 @@ class User extends Model
     {
         $user = self::getUserByLogin($login);
         if (!empty($user)) {
-            echo 'Пользователь с заданным логином существует';
+            echo 'Пользователь с заданным логином существует. ';
             return null;
         }
         $user = self::getUserByEmail($email);
         if (!empty($user)) {
-            echo 'На данный email зарегистрирован пользователь';
+            echo 'На данный email зарегистрирован пользователь. ';
             return null;
         }
         $user = new User();
@@ -79,17 +79,40 @@ class User extends Model
         }
     }
 
-    public function edit($id, $name, $login, $email, $password, $bDate, $description)
+    public static function edit($id)
     {
-        if (!empty($id)) {
-            $user = User::find($id);
-            $this->name = $name;
-            $this->login = $login;
-            $this->email = $email;
-            $this->password = $password;
-            $this->b_date = $bDate;
-            $this->description = $description;
-            $user->save();
+        return User::find($id);
+    }
+
+    public static function updateUser($id, $name, $login, $email, $password, $birthday, $description)
+    {
+        $user = self::getUserByLogin($login);
+        if (!empty($user) && $user[0]['id'] != $id) {
+            echo 'Пользователь с заданным логином существует. ';
+            return null;
         }
+        $user = self::getUserByEmail($email);
+        if (!empty($user) && $user[0]['id'] != $id) {
+            echo 'На данный email зарегистрирован пользователь. ';
+            return null;
+        }
+        $user = User::find($id);
+        if (empty($user)) {
+            echo 'Пользователя с таким Id нет. ';
+            return null;
+        }
+        $user->name = $name;
+        $user->login = $login;
+        $user->email = $email;
+        $user->password = $password;
+        $user->birthday = $birthday;
+        $user->description = $description;
+        $user->save();
+        return $user;
+    }
+
+    public static function getAll()
+    {
+        return User::with('files')->get()->toArray();
     }
 }

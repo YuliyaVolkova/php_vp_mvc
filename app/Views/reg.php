@@ -61,7 +61,7 @@
                                 <input type="text" class="form-control" id="inputName" placeholder="Введите Ваше имя" name="name" required>
                             </div>
                             <div class="form-subgroup2-right">
-                                <label for="birthday">Возраст</label>
+                                <label for="birthday">Дата рождения</label>
                                 <input type="date" class="form-control" id="birthday" placeholder="Введите дату рождения" name="birthday" required>
                             </div>
                         </div>

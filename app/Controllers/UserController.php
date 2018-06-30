@@ -46,10 +46,10 @@ class UserController extends MainController
                 if ($id == $_SESSION['authorized_id']) {
                     $_SESSION['authorized_id'] = 0;
                 }
-                echo 'Пользователь ' . $user->name . ' успешно удален';
+                echo 'Пользователь ' . $user->name . ' успешно удален. ';
                 echo '<div><a href="/user/all">Вернуться назад</a></div>';
             } else {
-                throw new Exception('Некорректный запрос на удаление');
+                throw new Exception('Некорректный запрос на удаление. ');
             }
         }
     }
