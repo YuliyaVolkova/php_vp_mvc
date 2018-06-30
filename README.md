@@ -73,7 +73,7 @@ Configuration
 в: .env
 
 
-he Database Structure
+Database Structure
 ======================
 
 Для создания таблиц БД, нужно в консоли запустить скрипт из директории
