@@ -1,0 +1,5 @@
+/vendor/
+.idea
+debug
+1.txt
+.env

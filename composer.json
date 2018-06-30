@@ -1,0 +1,27 @@
+{
+    "name": "yuliya_volkova/php_vp2",
+    "type": "project",
+    "description": "MVC",
+    "license": "GPL",
+    "autoload": {
+        "psr-4":
+        {
+            "App\\": "app/"
+        }
+    },
+    "require": {
+        "symfony/filesystem": "^4.1",
+        "wixel/gump": "^1.5",
+        "fzaninotto/faker": "^1.7",
+        "illuminate/database": "^5.6",
+        "intervention/image": "^2.4",
+        "nesbot/carbon": "^1.31",
+        "symfony/dotenv": "^4.1"
+    },
+    "authors": [
+        {
+            "name": "Yuliya Volkova",
+            "email": "Yuliyavolkova@gmail.com"
+        }
+    ]
+}

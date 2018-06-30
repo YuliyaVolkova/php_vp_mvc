@@ -1,0 +1,36 @@
+body {
+  padding-top: 50px;
+}
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+
+.form-container{
+  margin-top: 25%;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+.form-horizontal {
+  width: 45%;
+}
+.form-mes {
+  width: 45%;
+  color: cadetblue;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.form-mes_reg {
+    width: 100%;
+    color: cadetblue;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+.table-bordered {
+    margin: 20px 0;
+}
