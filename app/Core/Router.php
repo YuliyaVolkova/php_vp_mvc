@@ -27,7 +27,7 @@ class Router
         if (empty($routes[1]) || $routes[1] === 'index') {
             $file = APPLICATION_PATH . '/Controllers/' . $this->cName . 'Controller.php';
             $class = '\App\Controllers\\' . $this->cName . 'Controller';
-            $_SESSION['authorized_id'] = 0;
+            $_SESSION['authorized_id'] = null;
             return $this->rqCheck($file, $class, $this->cAction);
         } else {
             $controllerFromRq = ucfirst(strtolower($routes[1]));
@@ -60,7 +60,7 @@ class Router
             }
 
             if ($controllerFromRq === 'Reg' && empty($_POST)) {
-               $_SESSION['authorized_id'] = 0;
+                $_SESSION['authorized_id'] = null;
             }
 
             if ($controllerFromRq === 'User' && (!$_SESSION['authorized_id'])) {

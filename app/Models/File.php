@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-
 class File extends Model
 {
     protected $fillable = ['file_url', 'user_id'];
@@ -29,7 +28,7 @@ class File extends Model
         return $file->toArray();
     }
 
-        public function userData()
+    public function userData()
     {
         return $this->belongsTo('User', 'user_id', 'id');
     }

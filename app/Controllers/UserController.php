@@ -41,7 +41,7 @@ class UserController extends MainController
             $user =  User::remove($id);
             if ($user) {
                 if ($id == $_SESSION['authorized_id']) {
-                    $_SESSION['authorized_id'] = 0;
+                    $_SESSION['authorized_id'] = null;
                 }
                 echo 'Пользователь ' . $user->name . ' успешно удален. ';
                 echo '<div><a href="/user/all">Вернуться назад</a></div>';

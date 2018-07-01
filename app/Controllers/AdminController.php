@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Models\File;
 use App\Models\User;
-use Exception;
 use Gump;
 
 class AdminController extends MainController
@@ -39,7 +38,7 @@ class AdminController extends MainController
     {
         $this->data = $this->clearAll();
         if ($this->validation() === true) {
-            $this->data['password'] = crypt($this->data['password'], getenv('SALT'));
+            $this->data['password'] = password_hash($this->data['password'], PASSWORD_BCRYPT);
             $user = User::store($this->data['name'], $this->data['login'], $this->data['email'], $this->data['password'], $this->data['birthday'], $this->data['description']);
             if ($user === null) {
                 return null;
@@ -56,7 +55,6 @@ class AdminController extends MainController
             }
         } else {
             echo 'Ответ сервера: проверьте заполнение полей. ';
-            return null;
         }
     }
 
@@ -83,7 +81,7 @@ class AdminController extends MainController
         $this->data = $this->clearAll();
 
         if ($this->validation() === true) {
-            $this->data['password'] = crypt($this->data['password'], getenv('SALT'));
+            $this->data['password'] = password_hash($this->data['password'], PASSWORD_BCRYPT);
             $id=$_GET['id'];
             if (empty($id) || !intval($id)) {
                 echo 'Не указан Id пользователя';
@@ -103,7 +101,6 @@ class AdminController extends MainController
             echo 'Данные пользователя с email ' . $user->email . ' успешно обновлены. ';
         } else {
             echo 'Ответ сервера: проверьте заполнение полей.';
-            return null;
         }
     }
 
@@ -116,8 +113,6 @@ class AdminController extends MainController
             if ($user) {
                 echo 'Пользователь ' . $user->name . ' успешно удален. ';
                 echo '<div><a href="/admin/all">Вернуться назад</a></div>';
-            } else {
-                throw new Exception('Некорректный запрос на удаление. ');
             }
         }
     }

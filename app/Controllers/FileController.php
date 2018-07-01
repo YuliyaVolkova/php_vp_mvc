@@ -35,7 +35,6 @@ class FileController extends MainController
         } else {
             echo 'Ответ сервера: Не выбран файл.';
             echo '<div><a href="/file/user">Вернуться назад</a></div>';
-            return null;
         }
     }
 
@@ -47,8 +46,6 @@ class FileController extends MainController
             if ($file) {
                 echo 'Аватар ' . $file->file_url . ' успешно удален';
                 echo '<div><a href="/file/user">Вернуться назад</a></div>';
-            } else {
-                throw new Exception('Некорректный запрос на удаление');
             }
         }
     }
