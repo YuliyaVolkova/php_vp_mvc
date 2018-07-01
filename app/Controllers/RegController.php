@@ -36,13 +36,11 @@ class RegController extends MainController
         if ($this->validation() === true) {
             if ($this->data['password'] !== $this->data['password-again']) {
                 echo 'Правильно введите повторный пароль. ';
-                $_SESSION['authorized_id'] = 0;
                 return null;
             }
-            $this->data['password'] = crypt($this->data['password'], getenv('SALT'));
+            $this->data['password'] = password_hash($this->data['password'], PASSWORD_BCRYPT);
             $user = User::store($this->data['name'], $this->data['login'], $this->data['email'], $this->data['password'], $this->data['birthday'], $this->data['description']);
             if ($user === null) {
-                $_SESSION['authorized_id'] = 0;
                 return null;
             }
             if ($user['id']) {
@@ -55,12 +53,9 @@ class RegController extends MainController
                 $_SESSION['authorized_id'] = $user['id'];
             } else {
                 echo 'Регистрация не удалась, повторите попытку позже. ';
-                $_SESSION['authorized_id'] = 0;
             }
         } else {
             echo 'Ответ сервера: проверьте заполнение полей. ';
-            $_SESSION['authorized_id'] = 0;
-            return null;
         }
     }
 }

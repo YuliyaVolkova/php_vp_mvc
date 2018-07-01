@@ -71,7 +71,14 @@
             <tr>
                <td><?= $user['login'] ?></td>
                <td><?= $user['name'] ?></td>
-               <td><?= $user['birthday'] ?></td>
+               <td>
+                   <?php if ($user['birthday'] < 18) {
+                        echo $user['birthday'] . ' - Несовершеннолетний';
+                    } else {
+                        echo $user['birthday'] . ' - Совершеннолетний';
+                    }
+                    ?>
+               </td>
                <td><?= $user['description'] ?></td>
                <td>
                    Загружено: <?=count($user['files']) ?>

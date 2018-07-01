@@ -27,21 +27,16 @@ class LoginController extends MainController
     public function authorization()
     {
         $this->data = $this->clearAll();
-
         if ($this->gumpValidate() === true) {
-            $this->data['password'] = crypt($this->data['password'], getenv('SALT'));
-            $user = User::getUser($this->data['login'], $this->data['password']);
-            if (!empty($user)) {
+            $user = User::getUserByLogin($this->data['login']);
+            if (!empty($user) && password_verify($this->data['password'], $user[0]['password'])) {
                 echo 'Вы авторизированы, '  . $user[0]['name'] . '.';
                 $_SESSION['authorized_id'] = $user[0]['id'];
             } else {
                 echo 'Неверная пара логин - пароль.';
-                $_SESSION['authorized_id'] = 0;
             }
         } else {
             echo 'Ответ сервера: проверьте заполнение полей.';
-            $_SESSION['authorized_id'] = 0;
-            return null;
         }
     }
 }

@@ -5,7 +5,6 @@ namespace App\Controllers;
 use App\Models\File;
 use App\Models\User;
 use Carbon\Carbon;
-use Exception;
 
 class UserController extends MainController
 {
@@ -16,9 +15,7 @@ class UserController extends MainController
         $now = Carbon::now();
         $i = 0;
         foreach ($this->users as $user) {
-            $age = $now->diffInYears($user['birthday']);
-            $text = ($age < 18) ? ' - Несовершеннолетний' : ' - Совершеннолетний';
-            $this->users[$i++]['birthday'] = $age . $text;
+            $this->users[$i++]['birthday'] = $now->diffInYears($user['birthday']);
         }
     }
 
@@ -48,8 +45,6 @@ class UserController extends MainController
                 }
                 echo 'Пользователь ' . $user->name . ' успешно удален. ';
                 echo '<div><a href="/user/all">Вернуться назад</a></div>';
-            } else {
-                throw new Exception('Некорректный запрос на удаление. ');
             }
         }
     }
