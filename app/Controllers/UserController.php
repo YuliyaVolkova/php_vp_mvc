@@ -36,16 +36,22 @@ class UserController extends MainController
     public function delete()
     {
         $id = $_GET['id'];
-        if ($id > 0) {
-            File::removeAllByUser($id);
-            $user =  User::remove($id);
-            if ($user) {
-                if ($id == $_SESSION['authorized_id']) {
-                    $_SESSION['authorized_id'] = null;
-                }
-                echo 'Пользователь ' . $user->name . ' успешно удален. ';
-                echo '<div><a href="/user/all">Вернуться назад</a></div>';
-            }
+
+        if (empty($id) || $id == $_SESSION['authorized_id']) {
+            return $this->all();
         }
+
+        File::removeAllByUser($id);
+        $user =  User::remove($id);
+
+        if (empty($user)) {
+            return $this->all();
+        }
+
+        $data = [
+            'user' => $user,
+        ];
+
+        $this->view->render('mesUser', $data);
     }
 }

@@ -10,11 +10,7 @@ class LoginController extends MainController
     use ClearDataController;
 
     protected $data;
-
-    public function index()
-    {
-        $this->view->render('index', []);
-    }
+    protected $user;
 
     protected function gumpValidate()
     {
@@ -24,19 +20,37 @@ class LoginController extends MainController
         ]);
     }
 
+    protected function checkAuth()
+    {
+        if ($this->gumpValidate() !== true) {
+            return ERROR_CODE_FORM_VALIDATION;
+        }
+
+        $user = User::getUserByLogin($this->data['login']);
+
+        if (empty($user) || !password_verify($this->data['password'], $user[0]['password'])) {
+            return ERROR_CODE_AUTH;
+        }
+
+        $_SESSION['authorized_id'] = $user[0]['id'];
+        $this->user = $user[0];
+        return DONE_AUTH;
+    }
+
     public function authorization()
     {
         $this->data = $this->clearAll();
-        if ($this->gumpValidate() === true) {
-            $user = User::getUserByLogin($this->data['login']);
-            if (!empty($user) && password_verify($this->data['password'], $user[0]['password'])) {
-                echo 'Вы авторизированы, '  . $user[0]['name'] . '.';
-                $_SESSION['authorized_id'] = $user[0]['id'];
-            } else {
-                echo 'Неверная пара логин - пароль.';
-            }
-        } else {
-            echo 'Ответ сервера: проверьте заполнение полей.';
-        }
+
+        $data = [
+            'result' => $this->checkAuth(),
+            'user' => $this->user
+        ];
+
+        $this->view->render('loginAjax', $data);
+    }
+
+    public function index()
+    {
+        $this->view->render('index', []);
     }
 }

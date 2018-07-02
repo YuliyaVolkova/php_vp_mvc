@@ -11,15 +11,15 @@ class File extends Model
 
     public static function getFile($fileUrl, $userId)
     {
-        return $file = File::where('file_url', '=', $fileUrl)->where('user_id', '=', $userId)->get()->toArray();
+        return $file = File::where('file_url', '=', $fileUrl)
+            ->where('user_id', '=', $userId)->get()->toArray();
     }
 
     public static function store($fileUrl, $userId)
     {
         $file = self::getFile($fileUrl, $userId);
         if (!empty($file)) {
-            echo 'Вы добавили этот файл в базу ранее.';
-            return $file;
+            return null;
         }
         $file = new File();
         $file->file_url = $fileUrl;
@@ -35,27 +35,32 @@ class File extends Model
 
     public static function remove($id)
     {
-        if (!empty($id)) {
-            $file = File::find($id);
-            $file->delete();
-            return $file;
+        if (empty($id)) {
+            return null;
         }
+
+        $file = File::find($id);
+        $file->delete();
+        return $file;
     }
 
     public static function removeAllByUser($userId)
     {
-        if (!empty($userId)) {
-            $file = File::where('user_id', '=', $userId);
-            $file->delete();
-            return $file;
+        if (empty($usserId)) {
+            return null;
         }
+
+        $file = File::where('user_id', '=', $userId);
+        $file->delete();
+        return $file;
     }
 
     public static function getFilesByUser($userId)
     {
-        if ($userId) {
-            return File::where('user_id', '=', $userId)->get();
+        if (empty($userId)) {
+            return null;
         }
-        return null;
+
+        return File::where('user_id', '=', $userId)->get();
     }
 }

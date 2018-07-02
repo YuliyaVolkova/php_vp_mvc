@@ -11,17 +11,17 @@ class User extends Model
 
     public static function getUser($login, $password)
     {
-        return $user = User::where('login', '=', $login)->where('password', '=', $password)->get()->toArray();
+        return User::where('login', '=', $login)->where('password', '=', $password)->get()->toArray();
     }
 
     public static function getUserByLogin($login)
     {
-        return $user = User::where('login', '=', $login)->get()->toArray();
+        return User::where('login', '=', $login)->get()->toArray();
     }
 
     public static function getUserByEmail($email)
     {
-        return $user = User::where('email', '=', $email)->get()->toArray();
+        return User::where('email', '=', $email)->get()->toArray();
     }
 
     public function files()
@@ -32,13 +32,11 @@ class User extends Model
     public static function store($name, $login, $email, $password, $birthday, $description)
     {
         $user = self::getUserByLogin($login);
-        if (!empty($user)) {
-            echo 'Пользователь с заданным логином существует. ';
+        if (!empty($user)) {;
             return null;
         }
         $user = self::getUserByEmail($email);
         if (!empty($user)) {
-            echo 'На данный email зарегистрирован пользователь. ';
             return null;
         }
         $user = new User();
@@ -68,14 +66,17 @@ class User extends Model
 
     public static function remove($id)
     {
-        if (!empty($id)) {
-            $user = User::find($id);
-            if ($user) {
-                $user->delete();
-                return $user;
-            }
+        if (empty($id)) {
             return null;
         }
+
+        $user = User::find($id);
+
+        if (empty($user)) {
+            return null;
+        }
+        $user->delete();
+        return $user;
     }
 
     public static function edit($id)
@@ -87,19 +88,19 @@ class User extends Model
     {
         $user = self::getUserByLogin($login);
         if (!empty($user) && $user[0]['id'] != $id) {
-            echo 'Пользователь с заданным логином существует. ';
             return null;
         }
+
         $user = self::getUserByEmail($email);
         if (!empty($user) && $user[0]['id'] != $id) {
-            echo 'На данный email зарегистрирован пользователь. ';
             return null;
         }
+
         $user = User::find($id);
         if (empty($user)) {
-            echo 'Пользователя с таким Id нет. ';
             return null;
         }
+
         $user->name = $name;
         $user->login = $login;
         $user->email = $email;

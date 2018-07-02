@@ -11,6 +11,7 @@ class RegController extends MainController
     use ClearDataController, ImageClearController;
 
     protected $data;
+    protected $user;
 
     protected function validation()
     {
@@ -24,6 +25,33 @@ class RegController extends MainController
         ]);
     }
 
+    protected function checkRegistration()
+    {
+        if ($this->validation() !== true) {
+            return ERROR_CODE_FORM_VALIDATION;
+        }
+
+        if ($this->data['password'] !== $this->data['password-again']) {
+            return ERROR_CODE_PASSWORD_NOT_CONFIRM;
+        }
+        $this->data['password'] = password_hash($this->data['password'], PASSWORD_BCRYPT);
+        $user = User::store($this->data['name'], $this->data['login'], $this->data['email'], $this->data['password'], $this->data['birthday'], $this->data['description']);
+
+        if (empty($user)) {
+            return ERROR_CODE_RECORD_NOT_INSERT_IN_DB;
+        }
+
+        if (strlen($_FILES['photo']['name'])) {
+            $this->file = $_FILES['photo'];
+            $this->uploadedImageHandler();
+            File::store($this->filePath, $user['id']);
+        }
+
+        $_SESSION['authorized_id'] = $user['id'];
+        $this->user = $user;
+        return DONE_REGISTRATION;
+    }
+
     public function index()
     {
         $this->view->render('reg', []);
@@ -33,29 +61,11 @@ class RegController extends MainController
     {
         $this->data = $this->clearAll();
 
-        if ($this->validation() === true) {
-            if ($this->data['password'] !== $this->data['password-again']) {
-                echo 'Правильно введите повторный пароль. ';
-                return null;
-            }
-            $this->data['password'] = password_hash($this->data['password'], PASSWORD_BCRYPT);
-            $user = User::store($this->data['name'], $this->data['login'], $this->data['email'], $this->data['password'], $this->data['birthday'], $this->data['description']);
-            if ($user === null) {
-                return null;
-            }
-            if ($user['id']) {
-                if (strlen($_FILES['photo']['name'])) {
-                    $this->file = $_FILES['photo'];
-                    $this->uploadedImageHandler();
-                    File::store($this->filePath, $user['id']);
-                }
-                echo 'Вы зарегистрированы, '  . $user['name'] . '. ';
-                $_SESSION['authorized_id'] = $user['id'];
-            } else {
-                echo 'Регистрация не удалась, повторите попытку позже. ';
-            }
-        } else {
-            echo 'Ответ сервера: проверьте заполнение полей. ';
-        }
+        $data = [
+            'result' => $this->checkRegistration(),
+            'user' => $this->user
+        ];
+
+        $this->view->render('regAjax', $data);
     }
 }

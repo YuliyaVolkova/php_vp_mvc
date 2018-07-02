@@ -11,6 +11,7 @@ class AdminController extends MainController
     use ClearDataController, ImageClearController;
 
     protected $data;
+    protected $user;
 
     protected function validation()
     {
@@ -22,6 +23,57 @@ class AdminController extends MainController
             'password' => 'required|max_len,100|min_len,6'
         ]);
     }
+
+    protected function addUser()
+    {
+        if ($this->validation() !== true) {
+            return ERROR_CODE_FORM_VALIDATION;
+        }
+        $this->data['password'] = password_hash($this->data['password'], PASSWORD_BCRYPT);
+        $user = User::store($this->data['name'], $this->data['login'], $this->data['email'], $this->data['password'], $this->data['birthday'], $this->data['description']);
+
+        if (empty($user)) {
+            return ERROR_CODE_RECORD_NOT_INSERT_IN_DB;
+        }
+
+        if (strlen($_FILES['photo']['name'])) {
+            $this->file = $_FILES['photo'];
+            $this->uploadedImageHandler();
+            File::store($this->filePath, $user['id']);
+        }
+        $this->user = $user;
+        return DONE_REGISTRATION;
+    }
+
+    protected function editUser()
+    {
+        if ($this->validation() !== true) {
+            return ERROR_CODE_FORM_VALIDATION;
+        }
+
+        $this->data['password'] = password_hash($this->data['password'], PASSWORD_BCRYPT);
+
+        $id=$_GET['id'];
+        if (empty($id)) {
+            return ERROR_CODE_RECORD_NOT_UPDATED_IN_DB;
+        }
+
+        $user = User::updateUser($id, $this->data['name'], $this->data['login'], $this->data['email'], $this->data['password'], $this->data['birthday'], $this->data['description']);
+
+        if (empty($user)) {
+            return ERROR_CODE_RECORD_NOT_UPDATED_IN_DB;
+        }
+
+        if (strlen($_FILES['photo']['name'])) {
+            $this->file = $_FILES['photo'];
+            $this->uploadedImageHandler();
+            File::store($this->filePath, $user['id']);
+        }
+
+        $this->user = $user;
+        return DONE_UPDATE_USER;
+    }
+
     public function all()
     {
         $users = User::getAll();
@@ -37,41 +89,29 @@ class AdminController extends MainController
     public function store()
     {
         $this->data = $this->clearAll();
-        if ($this->validation() === true) {
-            $this->data['password'] = password_hash($this->data['password'], PASSWORD_BCRYPT);
-            $user = User::store($this->data['name'], $this->data['login'], $this->data['email'], $this->data['password'], $this->data['birthday'], $this->data['description']);
-            if ($user === null) {
-                return null;
-            }
-            if ($user['id']) {
-                if (strlen($_FILES['photo']['name'])) {
-                    $this->file = $_FILES['photo'];
-                    $this->uploadedImageHandler();
-                    File::store($this->filePath, $user['id']);
-                }
-                echo 'Новый пользователь  по имени '  . $user['name'] . ' добавлен. ';
-            } else {
-                echo 'Регистрация не удалась, повторите попытку позже. ';
-            }
-        } else {
-            echo 'Ответ сервера: проверьте заполнение полей. ';
-        }
+
+        $data = [
+            'result' => $this->addUser(),
+            'user' => $this->user
+        ];
+
+        $this->view->render('adminAjax', $data);
     }
 
     public function edit()
     {
         $id=$_GET['id'];
-        if (empty($id) || !intval($id)) {
-            echo 'Не указан Id пользователя';
-            echo '<div><a href="/admin/all">Вернуться назад</a></div>';
-            return null;
+
+        if (empty($id)) {
+            return $this->all();
         }
+
         $user = User::edit($id);
+
         if (empty($user)) {
-            echo 'Пользователя с таким Id нет';
-            echo '<div><a href="/admin/all">Вернуться назад</a></div>';
-            return null;
+            return $this->all();
         }
+
         $data = ['user' => $user];
         $this->view->render('edit', $data);
     }
@@ -80,40 +120,33 @@ class AdminController extends MainController
     {
         $this->data = $this->clearAll();
 
-        if ($this->validation() === true) {
-            $this->data['password'] = password_hash($this->data['password'], PASSWORD_BCRYPT);
-            $id=$_GET['id'];
-            if (empty($id) || !intval($id)) {
-                echo 'Не указан Id пользователя';
-                echo '<div><a href="/admin/all">Вернуться назад</a></div>';
-                return null;
-            }
-            $user = User::updateUser($id, $this->data['name'], $this->data['login'], $this->data['email'], $this->data['password'], $this->data['birthday'], $this->data['description']);
-            if (empty($user)) {
-                echo '<div><a href="/admin/all">Вернуться назад</a></div>';
-                return null;
-            }
-            if (strlen($_FILES['photo']['name'])) {
-               $this->file = $_FILES['photo'];
-               $this->uploadedImageHandler();
-               File::store($this->filePath, $user->id);
-            }
-            echo 'Данные пользователя с email ' . $user->email . ' успешно обновлены. ';
-        } else {
-            echo 'Ответ сервера: проверьте заполнение полей.';
-        }
+        $data = [
+            'result' => $this->editUser(),
+            'user' => $this->user
+        ];
+
+        $this->view->render('adminAjax', $data);
     }
 
     public function delete()
     {
         $id = $_GET['id'];
-        if ($id > 0) {
-            File::removeAllByUser($id);
-            $user =  User::remove($id);
-            if ($user) {
-                echo 'Пользователь ' . $user->name . ' успешно удален. ';
-                echo '<div><a href="/admin/all">Вернуться назад</a></div>';
-            }
+        if (empty($id)) {
+            return $this->all();
         }
+
+        File::removeAllByUser($id);
+        $user =  User::remove($id);
+
+        if (empty($user)) {
+            return $this->all();
+        }
+
+        $data = [
+            'result' => DONE_REMOVE_USER,
+            'user' => $user
+        ];
+
+        $this->view->render('mesAdmin', $data);
     }
 }

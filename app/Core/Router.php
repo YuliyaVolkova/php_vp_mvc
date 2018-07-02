@@ -29,50 +29,45 @@ class Router
             $class = '\App\Controllers\\' . $this->cName . 'Controller';
             $_SESSION['authorized_id'] = null;
             return $this->rqCheck($file, $class, $this->cAction);
-        } else {
-            $controllerFromRq = ucfirst(strtolower($routes[1]));
-            $fileFromRq = APPLICATION_PATH . '/Controllers/' . $controllerFromRq . 'Controller.php';
-            $classFromRq = '\App\Controllers\\' . $controllerFromRq . 'Controller';
-            $actionFromRq = (!empty($routes[2])) ? $routes[2] : $this->cAction;
-
-            if ($controllerFromRq === 'User' && explode('?', $actionFromRq)[0] === 'delete') {
-                $actionFromRq = 'delete';
-            }
-
-            if ($controllerFromRq === 'File' && explode('?', $actionFromRq)[0] === 'delete') {
-                $actionFromRq = 'delete';
-            }
-
-            if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'store' && !empty($_POST)) {
-                $actionFromRq = 'store';
-            }
-
-            if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'edit') {
-                $actionFromRq = 'edit';
-            }
-
-            if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'update' && !empty($_POST)) {
-                $actionFromRq = 'update';
-            }
-
-            if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'delete') {
-                $actionFromRq = 'delete';
-            }
-
-            if ($controllerFromRq === 'Reg' && empty($_POST)) {
-                $_SESSION['authorized_id'] = null;
-            }
-
-            if ($controllerFromRq === 'User' && (!$_SESSION['authorized_id'])) {
-                throw new Exception('Доступ только для авторизованных пользователей');
-            }
-
-            if ($controllerFromRq === 'File' && (!$_SESSION['authorized_id'])) {
-                throw new Exception('Доступ только для авторизованных пользователей');
-            }
-
-            return $this->rqCheck($fileFromRq, $classFromRq, $actionFromRq);
         }
+         $controllerFromRq = ucfirst(strtolower($routes[1]));
+         $fileFromRq = APPLICATION_PATH . '/Controllers/' . $controllerFromRq . 'Controller.php';
+         $classFromRq = '\App\Controllers\\' . $controllerFromRq . 'Controller';
+         $actionFromRq = (!empty($routes[2])) ? $routes[2] : $this->cAction;
+
+        if (($controllerFromRq === 'User' || $controllerFromRq === 'File') && explode('?', $actionFromRq)[0] === 'delete') {
+            $actionFromRq = 'delete';
+        }
+
+        if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'store' && !empty($_POST)) {
+            $actionFromRq = 'store';
+        }
+
+        if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'edit') {
+            $actionFromRq = 'edit';
+        }
+
+        if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'update' && !empty($_POST)) {
+            $actionFromRq = 'update';
+        }
+
+        if ($controllerFromRq === 'Admin' && explode('?', $actionFromRq)[0] === 'delete') {
+            $actionFromRq = 'delete';
+        }
+
+        if ($controllerFromRq === 'Reg' && empty($_POST)) {
+            $_SESSION['authorized_id'] = null;
+        }
+
+        if ($controllerFromRq === 'User' && (!$_SESSION['authorized_id'])) {
+            throw new Exception('Доступ только для авторизованных пользователей');
+        }
+
+        if ($controllerFromRq === 'File' && (!$_SESSION['authorized_id'])) {
+            throw new Exception('Доступ только для авторизованных пользователей');
+        }
+
+        return $this->rqCheck($fileFromRq, $classFromRq, $actionFromRq);
     }
 
     protected function rqCheck($file, $class, $action)
@@ -80,16 +75,14 @@ class Router
         if (!file_exists($file)) {
              throw new Exception('Controller file not found');
         }
-        if (class_exists($class)) {
-            $controller = new $class();
-        } else {
+        if (!class_exists($class)) {
             throw new Exception('File found but Class not found');
         }
-        if (method_exists($controller, $action)) {
-            $controller->$action();
-        } else {
+        $controller = new $class();
+        if (!method_exists($controller, $action)) {
             throw new Exception('Method not found');
         }
+        $controller->$action();
     }
 
     public function __construct()

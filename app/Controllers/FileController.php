@@ -3,50 +3,76 @@
 namespace App\Controllers;
 
 use App\Models\File;
-use Exception;
 
 class FileController extends MainController
 {
     use ImageClearController;
 
-    public function user()
+    protected $userId;
+
+    protected function store()
     {
-        $userId = $_SESSION['authorized_id'];
-        $files = File::getFilesByUser($userId);
-        $data = [
-            'files' => $files,
-        ];
-        $this->view->render('file_all', $data);
+        if (!strlen($_FILES['photo']['name'])) {
+            return ERROR_CODE_FILE_NOT_SELECT;
+        }
+
+        $this->file = $_FILES['photo'];
+
+        if (!$this->uploadedImageHandler()) {
+            return ERROR_CODE_FILE_NOT_UPLOADED;
+        }
+
+        $file = File::store($this->filePath, $this->userId);
+
+        if (empty($file)) {
+            return ERROR_CODE_RECORD_NOT_INSERT_IN_DB;
+        }
+
+        return DONE_UPLOAD_FILE;
     }
 
     public function create()
     {
-        $userId = $_SESSION['authorized_id'];
-        if ($userId && strlen($_FILES['photo']['name'])) {
-            $this->file = $_FILES['photo'];
-            $this->uploadedImageHandler();
-            $file = File::store($this->filePath, $userId);
-            if (!empty($file)) {
-                echo 'Файл загружен';
-                echo '<div><a href="/file/user">Вернуться назад</a></div>';
-            } else {
-                throw new Exception('Файл не загружен');
-            }
-        } else {
-            echo 'Ответ сервера: Не выбран файл.';
-            echo '<div><a href="/file/user">Вернуться назад</a></div>';
-        }
+        $this->userId = $_SESSION['authorized_id'];
+
+        $data = [
+            'result' => $this->store()
+            ];
+
+        $this->view->render('mesFile', $data);
     }
 
     public function delete()
     {
         $id = $_GET['id'];
-        if ($id > 0) {
-            $file =  File::remove($id);
-            if ($file) {
-                echo 'Аватар ' . $file->file_url . ' успешно удален';
-                echo '<div><a href="/file/user">Вернуться назад</a></div>';
-            }
+
+        if (empty($id)) {
+            return $this->user();
         }
+
+        $file =  File::remove($id);
+
+        if (empty($file)) {
+            return $this->user();
+        }
+
+        $data = [
+            'result' => DONE_REMOVE_FILE,
+            'file' => $file
+        ];
+
+        $this->view->render('mesFile', $data);
+    }
+
+    public function user()
+    {
+        $this->userId = $_SESSION['authorized_id'];
+        $files = File::getFilesByUser($this->userId);
+
+        $data = [
+            'files' => $files,
+        ];
+
+        $this->view->render('file_all', $data);
     }
 }
