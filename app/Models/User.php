@@ -9,19 +9,14 @@ class User extends Model
     protected $fillable = ['name', 'login', 'email', 'password', 'birthday', 'description'];
     public $table = "users";
 
-    public static function getUser($login, $password)
-    {
-        return User::where('login', '=', $login)->where('password', '=', $password)->get()->toArray();
-    }
-
     public static function getUserByLogin($login)
     {
-        return User::where('login', '=', $login)->get()->toArray();
+        return  User::where('login', '=', $login)->first();
     }
 
     public static function getUserByEmail($email)
     {
-        return User::where('email', '=', $email)->get()->toArray();
+        return User::where('email', '=', $email)->first();
     }
 
     public function files()
@@ -32,7 +27,7 @@ class User extends Model
     public static function store($name, $login, $email, $password, $birthday, $description)
     {
         $user = self::getUserByLogin($login);
-        if (!empty($user)) {;
+        if (!empty($user)) {
             return null;
         }
         $user = self::getUserByEmail($email);
@@ -87,12 +82,12 @@ class User extends Model
     public static function updateUser($id, $name, $login, $email, $password, $birthday, $description)
     {
         $user = self::getUserByLogin($login);
-        if (!empty($user) && $user[0]['id'] != $id) {
+        if (!empty($user) && $user->id != $id) {
             return null;
         }
 
         $user = self::getUserByEmail($email);
-        if (!empty($user) && $user[0]['id'] != $id) {
+        if (!empty($user) && $user->id != $id) {
             return null;
         }
 

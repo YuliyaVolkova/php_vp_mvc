@@ -12,7 +12,7 @@ class FileController extends MainController
 
     protected function store()
     {
-        if (!strlen($_FILES['photo']['name'])) {
+        if (empty($_FILES['photo']['name'])) {
             return ERROR_CODE_FILE_NOT_SELECT;
         }
 

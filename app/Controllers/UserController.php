@@ -13,9 +13,9 @@ class UserController extends MainController
     protected function setAge()
     {
         $now = Carbon::now();
-        $i = 0;
-        foreach ($this->users as $user) {
-            $this->users[$i++]['birthday'] = $now->diffInYears($user['birthday']);
+
+        foreach ($this->users as $key => $user) {
+            $this->users[$key]['birthday'] = $now->diffInYears($user['birthday']);
         }
     }
 

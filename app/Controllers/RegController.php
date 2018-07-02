@@ -15,7 +15,7 @@ class RegController extends MainController
 
     protected function validation()
     {
-        return $result = GUMP::is_valid($this->data, [
+        return GUMP::is_valid($this->data, [
             'name' => 'required|valid_name',
             'birthday' => 'required|date',
             'email' => 'required|valid_email',
@@ -41,7 +41,7 @@ class RegController extends MainController
             return ERROR_CODE_RECORD_NOT_INSERT_IN_DB;
         }
 
-        if (strlen($_FILES['photo']['name'])) {
+        if (!empty($_FILES['photo']['name'])) {
             $this->file = $_FILES['photo'];
             $this->uploadedImageHandler();
             File::store($this->filePath, $user['id']);

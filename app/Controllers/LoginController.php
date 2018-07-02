@@ -14,7 +14,7 @@ class LoginController extends MainController
 
     protected function gumpValidate()
     {
-        return $result = GUMP::is_valid($this->data, [
+        return GUMP::is_valid($this->data, [
             'login' => 'required|alpha_numeric',
             'password' => 'required|max_len,100|min_len,6'
         ]);
@@ -28,12 +28,12 @@ class LoginController extends MainController
 
         $user = User::getUserByLogin($this->data['login']);
 
-        if (empty($user) || !password_verify($this->data['password'], $user[0]['password'])) {
+        if (empty($user) || !password_verify($this->data['password'], $user->password)) {
             return ERROR_CODE_AUTH;
         }
 
-        $_SESSION['authorized_id'] = $user[0]['id'];
-        $this->user = $user[0];
+        $_SESSION['authorized_id'] = $user->id;
+        $this->user = $user;
         return DONE_AUTH;
     }
 
